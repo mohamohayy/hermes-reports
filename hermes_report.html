@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes Agent 系统报告</title>
+<style>
+  :root {
+    --bg: #0a0e17;
+    --card: #111827;
+    --border: #1e293b;
+    --accent: #3b82f6;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 2rem;
+    min-height: 100vh;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 2rem; padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 {
+    font-size: 1.8rem; background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .header .time { color: var(--muted); font-size: 0.9rem; }
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem; margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.2rem;
+  }
+  .stat-card .label { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 1.8rem; font-weight: 700; margin: 0.3rem 0; }
+  .stat-card .sub { color: var(--muted); font-size: 0.8rem; }
+  .section { margin-bottom: 2rem; }
+  .section-title {
+    font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .section-title .badge {
+    background: var(--accent); color: #fff; font-size: 0.7rem;
+    padding: 2px 8px; border-radius: 10px;
+  }
+  .module-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .module-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.2rem;
+    transition: border-color 0.2s;
+  }
+  .module-card:hover { border-color: var(--accent); }
+  .module-card .name { font-weight: 600; margin-bottom: 0.3rem; }
+  .module-card .desc { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.8rem; }
+  .status-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 0.4rem;
+  }
+  .status-online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .status-offline { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .status-partial { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+  .meta { color: var(--muted); font-size: 0.8rem; margin-top: 0.5rem; }
+  .timeline { position: relative; padding-left: 1.5rem; }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 2px; background: var(--border);
+  }
+  .tl-item { position: relative; padding-bottom: 1.2rem; }
+  .tl-item::before {
+    content: ''; position: absolute; left: -1.5rem; top: 0.4rem;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+    transform: translateX(-50%);
+  }
+  .tl-item .time { color: var(--muted); font-size: 0.8rem; }
+  .tl-item .event { margin-top: 0.2rem; }
+  .footer {
+    text-align: center; color: var(--muted); font-size: 0.8rem;
+    margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border);
+  }
+  @media (max-width: 600px) {
+    body { padding: 1rem; }
+    .header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Hermes Agent 系统报告</h1>
+    <div class="time" id="timestamp"></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="label">运行时间</div>
+      <div class="value">7<span style="font-size:1rem;color:var(--muted)">天</span></div>
+      <div class="sub">持续稳定运行</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">已处理消息</div>
+      <div class="value">1,284</div>
+      <div class="sub">自启动以来</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">活跃技能</div>
+      <div class="value">12</div>
+      <div class="sub">已加载可用</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">记忆使用</div>
+      <div class="value">76<span style="font-size:1rem;color:var(--muted)">%</span></div>
+      <div class="sub">2,086 / 2,200 字符</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">系统模块 <span class="badge">运行中</span></div>
+    <div class="module-grid">
+      <div class="module-card">
+        <div class="name"><span class="status-dot status-online"></span> 微信网关</div>
+        <div class="desc">Weixin 消息平台接入，实时处理 DM 与群聊</div>
+        <div class="meta">端口 8648 . 已连接</div>
+      </div>
+      <div class="module-card">
+        <div class="name"><span class="status-dot status-online"></span> Kanban 工作流</div>
+        <div class="desc">三角色协作：CEO / 工程师 / 审核员</div>
+        <div class="meta">3 profiles . 已配置</div>
+      </div>
+      <div class="module-card">
+        <div class="name"><span class="status-dot status-online"></span> 本地记忆系统</div>
+        <div class="desc">Qdrant + FastEmbed 向量记忆</div>
+        <div class="meta">F:hermes_memory_store</div>
+      </div>
+      <div class="module-card">
+        <div class="name"><span class="status-dot status-online"></span> Cron 调度器</div>
+        <div class="desc">定时任务系统</div>
+        <div class="meta">已启用</div>
+      </div>
+      <div class="module-card">
+        <div class="name"><span class="status-dot status-partial"></span> 浏览器自动化</div>
+        <div class="desc">browser-use 集成</div>
+        <div class="meta">Headless 模式</div>
+      </div>
+      <div class="module-card">
+        <div class="name"><span class="status-dot status-online"></span> 报告部署</div>
+        <div class="desc">GitHub Gist 自动部署</div>
+        <div class="meta">首次运行</div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">近期活动</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="time">2026-05-25 09:01</div>
+        <div class="event">老板分享抖音教程，开始分析可用功能</div>
+      </div>
+      <div class="tl-item">
+        <div class="time">2026-05-25</div>
+        <div class="event">部署 HTML 报告自动部署系统 (GitHub Gist)</div>
+      </div>
+      <div class="tl-item">
+        <div class="time">2026-05-23</div>
+        <div class="event">配置三角色 Kanban 工作流、本地记忆系统</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    Hermes Agent . 自动生成
+  </div>
+</div>
+<script>
+  const now = new Date();
+  const fmt = now.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+  document.getElementById('timestamp').textContent = fmt;
+</script>
+</body>
+</html>
